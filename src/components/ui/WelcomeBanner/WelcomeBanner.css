@@ -1,0 +1,79 @@
+.welcome-banner {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #8B0A1E 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-10);
+  color: var(--color-surface);
+  position: relative;
+  overflow: hidden;
+  animation: banner-slide-in 0.6s ease-out;
+}
+
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+
+.welcome-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  right: 10%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
+}
+
+.welcome-banner__greeting {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-2);
+}
+
+.welcome-banner__title {
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-2);
+  line-height: var(--line-height-tight);
+}
+
+.welcome-banner__description {
+  font-size: var(--font-size-body);
+  opacity: 0.9;
+  max-width: 600px;
+  line-height: var(--line-height-relaxed);
+}
+
+@keyframes banner-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-banner {
+    padding: var(--space-6);
+  }
+
+  .welcome-banner__title {
+    font-size: var(--font-size-h2);
+  }
+
+  .welcome-banner__description {
+    font-size: var(--font-size-caption);
+  }
+}

@@ -1,0 +1,125 @@
+.attendance-table {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  animation: card-fade-in 0.5s ease-out 0.5s backwards;
+}
+
+.attendance-table__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.attendance-table__title {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.attendance-table__table {
+  width: 100%;
+  font-size: var(--font-size-caption);
+}
+
+.attendance-table__table th {
+  padding: var(--space-3) var(--space-6);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background-color: var(--color-background);
+}
+
+.attendance-table__table td {
+  padding: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.attendance-table__table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.attendance-table__table tbody tr:hover {
+  background-color: var(--color-background);
+}
+
+.attendance-table__employee {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.attendance-table__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.attendance-table__time {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-primary);
+}
+
+.attendance-table__time--empty {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  font-family: var(--font-family);
+}
+
+.attendance-table__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+}
+
+.attendance-table__status--present {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.attendance-table__status--late {
+  background-color: var(--color-warning-bg);
+  color: #856404;
+}
+
+.attendance-table__status--absent {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.attendance-table__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: currentColor;
+}
+
+@media (max-width: 768px) {
+  .attendance-table__table th,
+  .attendance-table__table td {
+    padding: var(--space-3) var(--space-4);
+  }
+}

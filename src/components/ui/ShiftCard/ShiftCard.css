@@ -1,0 +1,125 @@
+.shift-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  animation: card-fade-in 0.5s ease-out 0.4s backwards;
+}
+
+.shift-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.shift-card__title {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.shift-card__count {
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.shift-card__table {
+  width: 100%;
+  font-size: var(--font-size-caption);
+}
+
+.shift-card__table th {
+  padding: var(--space-3) var(--space-6);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background-color: var(--color-background);
+}
+
+.shift-card__table td {
+  padding: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.shift-card__table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.shift-card__table tbody tr:hover {
+  background-color: var(--color-background);
+}
+
+.shift-card__employee {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.shift-card__employee-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.shift-card__status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+}
+
+.shift-card__status--active {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.shift-card__status--upcoming {
+  background-color: var(--color-info-bg);
+  color: #0c5460;
+}
+
+.shift-card__status--off {
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+}
+
+@keyframes card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .shift-card__table th,
+  .shift-card__table td {
+    padding: var(--space-3) var(--space-4);
+  }
+}

@@ -1,0 +1,15 @@
+.section-title {
+  margin-bottom: var(--space-4);
+}
+
+.section-title__heading {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.section-title__subtitle {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+}

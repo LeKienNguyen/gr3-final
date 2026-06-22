@@ -1,0 +1,101 @@
+.kpi-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  transition: all var(--transition-normal);
+  cursor: default;
+  animation: kpi-fade-in 0.5s ease-out backwards;
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: transparent;
+}
+
+.kpi-card__icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.5rem;
+}
+
+.kpi-card__icon-wrapper--red {
+  background-color: rgba(200, 16, 46, 0.1);
+  color: var(--color-primary);
+}
+
+.kpi-card__icon-wrapper--green {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.kpi-card__icon-wrapper--blue {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.kpi-card__icon-wrapper--yellow {
+  background-color: var(--color-warning-bg);
+  color: #b8860b;
+}
+
+.kpi-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.kpi-card__label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-1);
+}
+
+.kpi-card__value {
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  margin-bottom: var(--space-1);
+}
+
+.kpi-card__description {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+}
+
+@keyframes kpi-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .kpi-card {
+    padding: var(--space-4);
+  }
+
+  .kpi-card__icon-wrapper {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+  }
+
+  .kpi-card__value {
+    font-size: var(--font-size-h2);
+  }
+}
