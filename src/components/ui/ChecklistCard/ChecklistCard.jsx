@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ChecklistCard.css';
 
 const CheckIcon = () => (
@@ -6,7 +8,7 @@ const CheckIcon = () => (
   </svg>
 );
 
-const PLACEHOLDER_ITEMS = [
+const INITIAL_ITEMS = [
   { id: 1, label: 'Lau bàn khu vực A & B', checked: true, time: '06:30' },
   { id: 2, label: 'Kiểm tra bếp và thiết bị nấu', checked: true, time: '06:45' },
   { id: 3, label: 'Kiểm tra kho nguyên liệu', checked: false, time: null },
@@ -15,21 +17,38 @@ const PLACEHOLDER_ITEMS = [
 ];
 
 export const ChecklistCard = () => {
-  const completed = PLACEHOLDER_ITEMS.filter((i) => i.checked).length;
+  const [items, setItems] = useState(INITIAL_ITEMS);
+  const navigate = useNavigate();
+
+  const toggle = (id) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              checked: !item.checked,
+              time: !item.checked ? new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : null,
+            }
+          : item,
+      ),
+    );
+  };
+
+  const completed = items.filter((i) => i.checked).length;
 
   return (
     <div className="checklist-card">
       <div className="checklist-card__header">
-        <h3 className="checklist-card__title">
+        <h3 className="checklist-card__title" style={{ cursor: 'pointer' }} onClick={() => navigate('/checklist')}>
           🧹 Checklist vệ sinh hôm nay
         </h3>
         <span className="checklist-card__progress">
-          {completed}/{PLACEHOLDER_ITEMS.length} hoàn thành
+          {completed}/{items.length} hoàn thành
         </span>
       </div>
       <div className="checklist-card__list">
-        {PLACEHOLDER_ITEMS.map((item) => (
-          <div key={item.id} className="checklist-card__item">
+        {items.map((item) => (
+          <div key={item.id} className="checklist-card__item" onClick={() => toggle(item.id)} style={{ cursor: 'pointer' }}>
             <div className={`checklist-card__checkbox${item.checked ? ' checklist-card__checkbox--checked' : ''}`}>
               {item.checked && <CheckIcon />}
             </div>

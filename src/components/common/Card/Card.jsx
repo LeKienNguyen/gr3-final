@@ -1,7 +1,7 @@
 import './Card.css';
 
-export const Card = ({ children, title, subtitle, footer, className = '' }) => (
-  <div className={`card ${className}`}>
+export const Card = ({ children, title, subtitle, footer, className = '', ...props }) => (
+  <div className={`card ${className}`} {...props}>
     {title && (
       <div className="card__header">
         <div>

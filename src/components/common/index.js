@@ -13,3 +13,4 @@ export { SectionTitle } from './SectionTitle';
 export { SearchBox } from './SearchBox';
 export { Pagination } from './Pagination';
 export { TableContainer } from './TableContainer';
+export { ToastContainer } from './Toast';
