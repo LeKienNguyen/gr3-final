@@ -29,9 +29,13 @@ export const LoginPage = () => {
     if (!validate()) return;
     setLoading(true);
     try {
-      await login(email, password);
+      const { profile } = await login(email, password);
       toast.success('Đăng nhập thành công!');
-      navigate('/dashboard');
+      if (profile?.mustChangePassword) {
+        navigate('/change-password');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       const msg = err.code === 'auth/invalid-credential'
         ? 'Email hoặc mật khẩu không đúng'
@@ -78,9 +82,8 @@ export const LoginPage = () => {
         <Link to="/auth/forgot-password" className="login-page__link">
           Quên mật khẩu?
         </Link>
-        <span style={{ color: 'var(--color-text-secondary)' }}>
-          Chưa có tài khoản?{' '}
-          <Link to="/auth/register" className="login-page__link">Đăng ký</Link>
+        <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
+          Liên hệ Quản lý để được cấp tài khoản
         </span>
       </div>
     </div>

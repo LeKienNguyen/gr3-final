@@ -23,8 +23,16 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment
+# Environment variables
 .env
+.env.local
+.evn
+
+# Firebase
+functions/node_modules
+functions/lib
 
 # Screenshots
 screenshot-*.png
+test-*.png
+drive.mjs

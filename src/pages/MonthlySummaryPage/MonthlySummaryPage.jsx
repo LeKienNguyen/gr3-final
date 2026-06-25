@@ -1,41 +1,115 @@
-import { useState, useMemo } from 'react';
-import { PageTitle, Select, Badge, Button } from '@/components/common';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { PageTitle, Select, Badge, Button, Loading } from '@/components/common';
 import { PageContainer } from '@/components/layout';
 import { useToast } from '@/hooks/useToast';
+import { useAuth } from '@/hooks/useAuth';
+import { employeeService } from '@/services/employee.service';
+import { attendanceService } from '@/services/attendance.service';
 
-const EMPLOYEES_DATA = [
-  { name: 'Nguyễn Văn A', role: 'Staff', present: 22, late: 1, absent: 1, totalHours: 176 },
-  { name: 'Trần Thị B', role: 'Staff', present: 20, late: 3, absent: 1, totalHours: 168 },
-  { name: 'Lê Văn C', role: 'Chef', present: 23, late: 0, absent: 1, totalHours: 184 },
-  { name: 'Phạm Thị D', role: 'Staff', present: 18, late: 2, absent: 4, totalHours: 152 },
-  { name: 'Hoàng Văn E', role: 'Manager', present: 24, late: 0, absent: 0, totalHours: 192 },
-  { name: 'Vũ Thị F', role: 'Chef', present: 21, late: 1, absent: 2, totalHours: 172 },
-  { name: 'Đặng Văn G', role: 'Staff', present: 19, late: 4, absent: 1, totalHours: 160 },
-  { name: 'Bùi Thị H', role: 'Staff', present: 22, late: 0, absent: 2, totalHours: 176 },
-];
-
-const MONTHS = Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1), label: `Tháng ${i + 1}` }));
+const MONTHS = Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1).padStart(2, '0'), label: `Tháng ${i + 1}` }));
 const YEARS = [{ value: '2026', label: '2026' }, { value: '2025', label: '2025' }];
 
 export const MonthlySummaryPage = () => {
-  const [month, setMonth] = useState(String(new Date().getMonth() + 1));
-  const [year, setYear] = useState('2026');
+  const [month, setMonth] = useState(String(new Date().getMonth() + 1).padStart(2, '0'));
+  const [year, setYear] = useState(String(new Date().getFullYear()));
+  const [employees, setEmployees] = useState([]);
+  const [attRecords, setAttRecords] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
   const toast = useToast();
+  const { isManager, userProfile, user } = useAuth();
+  const myId = userProfile?.id || user?.uid;
 
-  const totals = useMemo(() => EMPLOYEES_DATA.reduce((acc, e) => ({
+  const fetchData = useCallback(async () => {
+    setLoadingData(true);
+    try {
+      if (isManager) {
+        const empSnap = await employeeService.getEmployees();
+        setEmployees(empSnap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((e) => e.status !== 'inactive'));
+      } else {
+        setEmployees([{
+          id: myId,
+          name: userProfile?.name || user?.displayName || '',
+          role: userProfile?.role || 'employee',
+        }]);
+      }
+
+      const startDate = `${year}-${month}-01`;
+      const lastDay = new Date(Number(year), Number(month), 0).getDate();
+      const endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+
+      const attSnap = await attendanceService.getByDateRange(startDate, endDate);
+      const allRecords = attSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setAttRecords(isManager ? allRecords : allRecords.filter((a) => a.employeeId === myId));
+    } catch {
+      toast.error('Không thể tải dữ liệu');
+    } finally {
+      setLoadingData(false);
+    }
+  }, [month, year, isManager, myId, userProfile, user, toast]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const employeeStats = useMemo(() => {
+    const lastDay = new Date(Number(year), Number(month), 0).getDate();
+    return employees.map((emp) => {
+      const empAtt = attRecords.filter((a) => a.employeeId === emp.id);
+      const present = empAtt.filter((a) => a.status === 'present').length;
+      const late = empAtt.filter((a) => a.status === 'late').length;
+      const totalCheckedIn = empAtt.filter((a) => a.checkIn).length;
+      const absent = Math.max(0, lastDay - totalCheckedIn);
+
+      let totalMinutes = 0;
+      empAtt.filter((a) => a.checkIn && a.checkOut).forEach((a) => {
+        const [inH, inM] = (a.checkIn || '0:0').split(':').map(Number);
+        const [outH, outM] = (a.checkOut || '0:0').split(':').map(Number);
+        totalMinutes += (outH * 60 + outM) - (inH * 60 + inM);
+      });
+
+      return {
+        name: emp.name,
+        role: emp.role,
+        present,
+        late,
+        absent,
+        totalHours: Math.round(totalMinutes / 60),
+      };
+    });
+  }, [employees, attRecords, month, year]);
+
+  const totals = useMemo(() => employeeStats.reduce((acc, e) => ({
     present: acc.present + e.present,
     late: acc.late + e.late,
     absent: acc.absent + e.absent,
     hours: acc.hours + e.totalHours,
-  }), { present: 0, late: 0, absent: 0, hours: 0 }), []);
+  }), { present: 0, late: 0, absent: 0, hours: 0 }), [employeeStats]);
 
   const exportReport = () => {
+    let csv = 'Nhân viên,Vai trò,Có mặt,Đi trễ,Vắng,Tổng giờ,Đánh giá\n';
+    employeeStats.forEach((emp) => {
+      const total = emp.present + emp.late + emp.absent;
+      const rate = total > 0 ? Math.round((emp.present / total) * 100) : 0;
+      csv += `"${emp.name}","${emp.role}",${emp.present},${emp.late},${emp.absent},${emp.totalHours},${rate}%\n`;
+    });
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `tong-cong-thang-${month}-${year}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
     toast.success('Đã xuất báo cáo tổng công tháng');
   };
 
+  if (loadingData) return <PageContainer><Loading text="Đang tải dữ liệu..." /></PageContainer>;
+
   return (
     <PageContainer>
-      <PageTitle title="Tổng công tháng" subtitle="Tổng hợp công theo tháng" action={<Button onClick={exportReport}>Xuất báo cáo</Button>} />
+      <PageTitle
+        title={isManager ? 'Tổng công tháng' : 'Tổng công của tôi'}
+        subtitle={isManager ? 'Tổng hợp công theo tháng' : 'Xem tổng giờ làm việc của bạn'}
+        action={isManager && <Button onClick={exportReport}>Xuất báo cáo</Button>}
+      />
 
       <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
         <Select id="ms-month" options={MONTHS} value={month} onChange={(e) => setMonth(e.target.value)} />
@@ -61,8 +135,11 @@ export const MonthlySummaryPage = () => {
             </tr>
           </thead>
           <tbody>
-            {EMPLOYEES_DATA.map((emp) => {
-              const rate = Math.round((emp.present / (emp.present + emp.late + emp.absent)) * 100);
+            {employeeStats.length === 0 ? (
+              <tr><td colSpan={7} style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-secondary)' }}>Không có dữ liệu</td></tr>
+            ) : employeeStats.map((emp) => {
+              const total = emp.present + emp.late + emp.absent;
+              const rate = total > 0 ? Math.round((emp.present / total) * 100) : 0;
               return (
                 <tr key={emp.name} style={{ borderBottom: '1px solid var(--color-border)' }}>
                   <td style={{ padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--font-size-caption)', fontWeight: 500 }}>{emp.name}</td>

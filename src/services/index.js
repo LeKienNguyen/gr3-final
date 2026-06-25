@@ -5,3 +5,8 @@ export { feedbackService } from './feedback.service';
 export { forecastingService } from './forecasting.service';
 export { employeeService } from './employee.service';
 export { notificationService } from './notification.service';
+export { attendanceService } from './attendance.service';
+export { scheduleService } from './schedule.service';
+export { checklistService } from './checklist.service';
+export { activityService } from './activity.service';
+export { settingsService } from './settings.service';

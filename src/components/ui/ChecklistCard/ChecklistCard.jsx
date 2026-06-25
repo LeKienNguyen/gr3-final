@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { checklistService } from '@/services/checklist.service';
 import './ChecklistCard.css';
 
 const CheckIcon = () => (
@@ -8,30 +9,32 @@ const CheckIcon = () => (
   </svg>
 );
 
-const INITIAL_ITEMS = [
-  { id: 1, label: 'Lau bàn khu vực A & B', checked: true, time: '06:30' },
-  { id: 2, label: 'Kiểm tra bếp và thiết bị nấu', checked: true, time: '06:45' },
-  { id: 3, label: 'Kiểm tra kho nguyên liệu', checked: false, time: null },
-  { id: 4, label: 'Dọn dẹp khu vực khách hàng', checked: false, time: null },
-  { id: 5, label: 'Vệ sinh nhà vệ sinh', checked: false, time: null },
-];
-
-export const ChecklistCard = () => {
-  const [items, setItems] = useState(INITIAL_ITEMS);
+export const ChecklistCard = ({ data = [] }) => {
+  const [localUpdates, setLocalUpdates] = useState({});
   const navigate = useNavigate();
 
-  const toggle = (id) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              checked: !item.checked,
-              time: !item.checked ? new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : null,
-            }
-          : item,
-      ),
+  const firstChecklist = data[0];
+  const items = (firstChecklist?.items || []).map((item) =>
+    localUpdates[item.id] !== undefined ? { ...item, ...localUpdates[item.id] } : item,
+  );
+
+  const toggle = async (itemId) => {
+    if (!firstChecklist) return;
+    const item = items.find((i) => i.id === itemId);
+    if (!item) return;
+    const newChecked = !item.checked;
+    const newTime = newChecked ? new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : null;
+
+    setLocalUpdates((prev) => ({ ...prev, [itemId]: { checked: newChecked, time: newTime } }));
+
+    const updatedItems = (firstChecklist.items || []).map((i) =>
+      i.id === itemId ? { ...i, checked: newChecked, time: newTime } : i,
     );
+    try {
+      await checklistService.update(firstChecklist.id, { items: updatedItems });
+    } catch {
+      setLocalUpdates((prev) => { const next = { ...prev }; delete next[itemId]; return next; });
+    }
   };
 
   const completed = items.filter((i) => i.checked).length;
@@ -47,7 +50,9 @@ export const ChecklistCard = () => {
         </span>
       </div>
       <div className="checklist-card__list">
-        {items.map((item) => (
+        {items.length === 0 ? (
+          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: 'var(--space-3)', fontSize: 'var(--font-size-caption)' }}>Chưa có checklist hôm nay</p>
+        ) : items.map((item) => (
           <div key={item.id} className="checklist-card__item" onClick={() => toggle(item.id)} style={{ cursor: 'pointer' }}>
             <div className={`checklist-card__checkbox${item.checked ? ' checklist-card__checkbox--checked' : ''}`}>
               {item.checked && <CheckIcon />}

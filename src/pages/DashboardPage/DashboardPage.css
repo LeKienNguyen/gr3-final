@@ -12,6 +12,10 @@
   gap: var(--space-4);
 }
 
+.dashboard__kpi-grid--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .dashboard__section-label {
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-semibold);
@@ -48,7 +52,8 @@
 }
 
 @media (max-width: 640px) {
-  .dashboard__kpi-grid {
+  .dashboard__kpi-grid,
+  .dashboard__kpi-grid--three {
     grid-template-columns: 1fr;
   }
 

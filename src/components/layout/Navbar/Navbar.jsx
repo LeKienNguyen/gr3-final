@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { ROLE_LABELS } from '@/constants/roles';
 import './Navbar.css';
 
 const MenuIcon = () => (
@@ -30,14 +31,6 @@ const formatDate = () => {
   return now.toLocaleDateString('vi-VN', options);
 };
 
-const MOCK_NOTIFICATIONS = [
-  { id: 1, text: 'Nguyễn Văn A đã check-in ca sáng', time: '5 phút trước', read: false },
-  { id: 2, text: 'Checklist vệ sinh buổi sáng đã hoàn thành', time: '15 phút trước', read: false },
-  { id: 3, text: 'Trần Thị B đăng ký ca chiều thứ 7', time: '1 giờ trước', read: false },
-  { id: 4, text: 'Kho nguyên liệu: Thịt bò sắp hết', time: '2 giờ trước', read: true },
-  { id: 5, text: 'Phạm Thị D đã check-out ca sáng', time: '3 giờ trước', read: true },
-];
-
 const useClickOutside = (ref, handler) => {
   useEffect(() => {
     const listener = (e) => {
@@ -53,10 +46,10 @@ export const Navbar = ({ onToggleSidebar, onSearch }) => {
   const [searchValue, setSearchValue] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
   const userRef = useRef(null);
-  const { user, logout } = useAuth();
+  const { user, userProfile, logout } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -94,8 +87,9 @@ export const Navbar = ({ onToggleSidebar, onSearch }) => {
   };
 
   const userEmail = user?.email || '';
-  const displayName = user?.displayName || userEmail.split('@')[0] || 'Quản lý';
-  const initials = displayName.slice(0, 2).toUpperCase();
+  const displayName = userProfile?.name || user?.displayName || userEmail.split('@')[0] || 'User';
+  const roleName = ROLE_LABELS[userProfile?.role] || 'Nhân viên';
+  const initials = displayName.split(' ').slice(-2).map((n) => n[0]).join('').toUpperCase() || 'U';
 
   return (
     <header className="navbar">
@@ -146,7 +140,11 @@ export const Navbar = ({ onToggleSidebar, onSearch }) => {
                 )}
               </div>
               <div className="navbar__dropdown-list">
-                {notifications.map((n) => (
+                {notifications.length === 0 ? (
+                  <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-caption)' }}>
+                    Không có thông báo
+                  </div>
+                ) : notifications.map((n) => (
                   <div
                     key={n.id}
                     className={`navbar__notif-item${n.read ? '' : ' navbar__notif-item--unread'}`}
@@ -175,7 +173,7 @@ export const Navbar = ({ onToggleSidebar, onSearch }) => {
             <div className="navbar__avatar">{initials}</div>
             <div className="navbar__user-info">
               <span className="navbar__user-name">{displayName}</span>
-              <span className="navbar__user-role">Manager</span>
+              <span className="navbar__user-role">{roleName}</span>
             </div>
           </div>
 

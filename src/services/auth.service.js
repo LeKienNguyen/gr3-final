@@ -1,20 +1,9 @@
-import { loginUser, registerUser, logoutUser, resetPassword, updateUserProfile } from '@/api/auth';
-import { addDocument, getDocument, updateDocument } from '@/api/firestore';
+import { loginUser, logoutUser, resetPassword } from '@/api/auth';
+import { getDocument, updateDocument } from '@/api/firestore';
 import { COLLECTIONS } from '@/constants';
 
 export const authService = {
   login: (email, password) => loginUser(email, password),
-
-  register: async (email, password, profileData) => {
-    const credential = await registerUser(email, password);
-    await updateUserProfile(credential.user, { displayName: profileData.name });
-    await addDocument(COLLECTIONS.USERS, {
-      uid: credential.user.uid,
-      email,
-      ...profileData,
-    });
-    return credential;
-  },
 
   logout: () => logoutUser(),
 

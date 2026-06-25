@@ -16,6 +16,10 @@ export const COLLECTIONS = {
   EMPLOYEES: 'employees',
   FORECASTS: 'forecasts',
   SETTINGS: 'settings',
+  ATTENDANCE: 'attendance',
+  SCHEDULES: 'schedules',
+  CHECKLISTS: 'checklists',
+  ACTIVITIES: 'activities',
 };
 
 export const PAGINATION = {

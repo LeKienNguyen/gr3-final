@@ -4,8 +4,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 import './Sidebar.css';
 
+const MANAGER_ONLY_PATHS = ['/employees', '/reports'];
+
+const EMPLOYEE_LABELS = {
+  '/attendance': 'Chấm công của tôi',
+  '/monthly-summary': 'Tổng công của tôi',
+  '/shift-registration': 'Lịch ca của tôi',
+};
+
 export const Sidebar = ({ isCollapsed, isMobileOpen, onCloseMobile }) => {
-  const { logout } = useAuth();
+  const { logout, isManager } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -18,6 +26,15 @@ export const Sidebar = ({ isCollapsed, isMobileOpen, onCloseMobile }) => {
       toast.error('Đăng xuất thất bại');
     }
   };
+
+  const visibleLinks = SIDEBAR_LINKS
+    .filter((link) => isManager || !MANAGER_ONLY_PATHS.includes(link.path))
+    .map((link) => {
+      if (!isManager && EMPLOYEE_LABELS[link.path]) {
+        return { ...link, label: EMPLOYEE_LABELS[link.path] };
+      }
+      return link;
+    });
 
   return (
     <>
@@ -43,7 +60,7 @@ export const Sidebar = ({ isCollapsed, isMobileOpen, onCloseMobile }) => {
 
         <nav className="sidebar__nav" aria-label="Menu chính">
           <ul className="sidebar__nav-list">
-            {SIDEBAR_LINKS.map((link) => (
+            {visibleLinks.map((link) => (
               <li key={link.path}>
                 <NavLink
                   to={link.path}
